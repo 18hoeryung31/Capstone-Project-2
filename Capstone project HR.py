@@ -57,7 +57,7 @@ class Border(spgl.Sprite):
 # Initial Game setup
 game = spgl.Game(850, 850, "light blue", "Collect balloons to fly to South American Wilderness!", 0)
 game.score = 0
-game.time = 30
+game.current_time = 30
 
 # Create Sprites
 	# Keep List of Sprites
@@ -118,30 +118,20 @@ class Balloon(spgl.Sprite):
 		self.goto(random.randint(-250, 250), random.randint(-250, 250))
 		self.setheading(random.randint(0,360))
 		
-	#Border Checking 
-	def move(self):
-		if self.xcor() > 290 or self.xcor() < -290:
-			self.left(90)
-		if self.ycor() > 290 or self.ycor() < -290:
-			self.left(90)
 			
 	
 	def tick(self):
 		self.forward(self.speed)
-		
-		if self.xcor() > 290 or self.xcor() < -290:
-			self.left(60)
-		if self.ycor() > 290 or self.ycor() < -290:
-			self.left(60)
-			
+
 		if self.xcor() > ((border.width/2) - 10):
-			self.direction = "left"
-		elif self.xcor() < ((border.width/2) + 10):
-			self.direction = "right"
+			self.lt(60)
+		
+		elif self.xcor() < (-(border.width/2) + 10):
+			self.lt(60)
 		elif self.ycor() > ((border.width/2) - 10):
-			self.direction = "down"
-		elif self.ycor() < ((border.width/2) + 10):
-			self.direction = "up"
+			self.lt(60)
+		elif self.ycor() < (-(border.width/2) + 10):
+			self.lt(60)
 	
 		
 class Bird(spgl.Sprite):
@@ -158,30 +148,21 @@ class Bird(spgl.Sprite):
 		self.goto(random.randint(-240, 240), random.randint(-240, 240))
 		self.setheading(random.randint(0,360))
 		
-	#Border Checking 
-	def move(self):
-		if self.xcor() > 290 or self.xcor() < -290:
-			self.left(90)
-		if self.ycor() > 290 or self.ycor() < -290:
-			self.left(90)
+
 			
 	
 	def tick(self):
 		self.forward(self.speed)
-		
-		if self.xcor() > 290 or self.xcor() < -290:
-			self.left(60)
-		if self.ycor() > 290 or self.ycor() < -290:
-			self.left(60)
+	
 			
 		if self.xcor() > ((border.width/2) - 10):
-			self.direction = "left"
-		elif self.xcor() < ((border.width/2) + 10):
-			self.direction = "right"
+			self.lt(60)
+		elif self.xcor() < (-(border.width/2) + 10):
+			self.lt(60)
 		elif self.ycor() > ((border.width/2) - 10):
-			self.direction = "down"
-		elif self.ycor() < ((border.width/2) + 10):
-			self.direction = "up"
+			self.lt(60)
+		elif self.ycor() < (-(border.width/2) + 10):
+			self.lt(60)
 	
 	
 
@@ -210,11 +191,11 @@ border = Border()
 border.draw_border()
 	
 balloons = []
-for count in range(5):
+for count in range(8):
 	balloons.append(Balloon("circle", "green", random.randint(-250, 250), random.randint(-250, 250)))
 
 birds = []
-for count in range(4):
+for count in range(5):
 	birds.append(Bird("square", "pink", random.randint(-250, 250), random.randint(-250, 250)))
 	
 	
@@ -240,15 +221,18 @@ game.set_keyboard_binding(spgl.KEY_RIGHT, russell.moveright)
 while True:
 	# Call the game tick method
 	game.tick()
-	game.time -= 1
-	time_label.update("Time: {}".format(game.time))
+	game.current_time -= 1
+	time_label.update("Time: {}".format(game.current_time))
 	
 	for balloon in balloons:	
 		if isCollision(russell, balloon):
 			balloon.jump()
 			game.score += 10
 			score_label.update("Score: {}".format(game.score))
-	
+			if game.score == 100:
+				print ("You won!")
+				exit()
+				
 	for bird in birds:			
 		if isCollision(russell, bird):
 			bird.jump()
@@ -257,6 +241,7 @@ while True:
 			border.width -= 100
 			border.height -= 100
 			border.draw_border()
+			
 			if border.width == 100 and border.height == 100:
 				print ("The end")
 				exit()
